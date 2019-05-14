@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+telegram_token
+db.json
+
 # Distribution / packaging
 .Python
 build/
