@@ -24,13 +24,23 @@ db = DB()
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
 def start(bot : Bot, update : Update):
-    """Send a message when the command /start is issued."""        
-    bot.send_message(chat_id=update.message.chat_id, text='Hi!')
+    """Send a message when the command /start is issued."""   
+    text = 'Hi! Im rss bot and would check your rss feed every 5 minutes!'
+    text += '\nNAME URL - to add feed'
+    text += '\n/list or /ls - to show all your feeds'
+    text += '\n/notify or /n - to manually check feeds'
+    text += '\nEnjoy!'
+    bot.send_message(chat_id=update.message.chat_id, text=text)
 
 
 def help(bot : Bot, update : Update):
     """Send a message when the command /help is issued."""
-    bot.send_message(chat_id=update.message.chat_id, text='Help!')
+    text = 'Hi! Im rss bot and would check your rss feed every 5 minutes!'
+    text += '\nNAME URL - to add feed'
+    text += '\n/list or /ls - to show all your feeds'
+    text += '\n/notify or /n - to manually check feeds'
+    text += '\nEnjoy!'
+    bot.send_message(chat_id=update.message.chat_id, text=text)
 
 def notifyNew(bot : Bot, update : Update):      
     chat_id = update.message.chat_id
@@ -104,7 +114,9 @@ def notificationCycle(bot: Bot, sc):
                 notifier: Notifier = Notifier(bot, chat)
                 any: bool = notifier.notify()        
                 if any:                
-                    db.update(chat)   
+                    db.update(chat)
+               # else:
+               #     bot.send_message(chat_id=chat.id, text='No updates')
             except:
                 problem = sys.exc_info()[0]
                 logger.error('error in cycle for ' + chat.id + ' ' + problem)
