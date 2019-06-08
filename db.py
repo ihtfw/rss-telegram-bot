@@ -33,7 +33,11 @@ class DB:
     def to_json(self, chat: Chat):
         json = {'id': chat.id, 'feeds': []}
         for feed in chat.feeds:
-            json['feeds'].append({'key': feed.key, 'url': feed.url, 'lastUpdate': feed.lastUpdate})
+            jFeed = {'key': feed.key, 'url': feed.url, 'lastUpdate': feed.lastUpdate, 'filterBy': []}            
+            for filter in feed.filterBy:
+                jFeed['filterBy'].append(filter)
+
+            json['feeds'].append(jFeed)
 
         return json
 
@@ -41,7 +45,9 @@ class DB:
         chat = Chat(json['id'])
         for jFeed in json['feeds']:
             feed: Feed = Feed(jFeed['key'], jFeed['url'])
-            feed.lastUpdate = jFeed['lastUpdate']
+            feed.lastUpdate = jFeed['lastUpdate']            
+            feed.addFilterBy(jFeed['filterBy'])
+
             chat.addfeed(feed)
         return chat
 

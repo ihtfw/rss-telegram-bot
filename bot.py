@@ -66,6 +66,52 @@ def listFeeds(bot : Bot, update : Update):
     for feed in chat.feeds:                
         bot.send_message(chat_id=chat_id, text=feed.key + ':' + feed.url)
 
+def getFilterBy(bot : Bot, update : Update):
+    """List all filterBy"""    
+    chat_id = update.message.chat_id
+    chat = db.getchat(chat_id)
+    
+    msg: str = update.message.text    
+    args = msg.split(' ')
+    if len(args) != 2:        
+        bot.send_message(chat_id=chat_id, text="Should be one arg: name")
+        return
+        
+    for feed in chat.feeds:                
+        if feed.key == args[1]:
+            if len(feed.filterBy) > 0:
+                bot.send_message(chat_id=chat_id, text=", ".join(feed.filterBy))                
+                return
+                
+            bot.send_message(chat_id=chat_id, text="FilterBy is empty!")
+            return
+            
+    
+    bot.send_message(chat_id=chat_id, text="Feed not found!")
+
+def addFilterBy(bot : Bot, update : Update):
+    """Add filterBy"""    
+    chat_id = update.message.chat_id
+    chat = db.getchat(chat_id)
+    
+    msg: str = update.message.text    
+    args = msg.split(' ')
+    if len(args) < 3:        
+        bot.send_message(chat_id=chat_id, text="Should be two args: name and filterBy")
+        return
+        
+    for feed in chat.feeds:                
+        if feed.key == args[1]:          
+            filterBy: str = " ".join(args[2::]) 
+            feed.addFilterByItem(filterBy)
+            bot.send_message(chat_id=chat_id, text="Added " + filterBy)
+            
+            db.update(chat)
+            return
+            
+    
+    bot.send_message(chat_id=chat_id, text="Feed not found!")
+
 
 def handleMessage(bot : Bot, update : Update):
     """Echo the user message."""
@@ -152,10 +198,20 @@ def main():
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
+
     dp.add_handler(CommandHandler("list", listFeeds))
     dp.add_handler(CommandHandler("ls", listFeeds))
+
     dp.add_handler(CommandHandler("notify", notifyNew))
     dp.add_handler(CommandHandler("n", notifyNew))
+
+    dp.add_handler(CommandHandler("getFilterBy", getFilterBy))
+    dp.add_handler(CommandHandler("list-filters", getFilterBy))
+    dp.add_handler(CommandHandler("lf", getFilterBy))
+
+    dp.add_handler(CommandHandler("addFilterBy", addFilterBy))
+    dp.add_handler(CommandHandler("add-filter", addFilterBy))
+    dp.add_handler(CommandHandler("af", addFilterBy))
 
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text, handleMessage))

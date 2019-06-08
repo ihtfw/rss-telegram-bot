@@ -3,8 +3,10 @@ Telegram Bot that would read rss fead and send it to you as messages
 
 # command list
 - help - to show help
-- list - list your feeds
-- notify - manually update feeds
+- list - list your feeds (shortcut /ls)
+- notify - manually update feeds (shortcut /n)
+- list-filters - list exluded key words (shortcut /lf) i.e /lf myFeedName
+- add-filter - add key word to exclude (shortcut /af) i.e /af myFeedName not interesting phrase
 
 # pip dependencies
 - python-telegram-bot

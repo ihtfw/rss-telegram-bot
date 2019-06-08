@@ -5,6 +5,20 @@ class Feed:
         self.key = key
         self.url = url
         self.lastUpdate = None
+        self.filterBy = []
+
+    def addFilterBy(self, filterBy: []):
+        if filterBy is None:
+            return
+
+        for filter in filterBy:
+            self.filterBy.append(filter)
+
+    def addFilterByItem(self, filterBy: str):
+        if filterBy is None:
+            return
+
+        self.filterBy.append(filterBy)
     
 
 class Chat:   
@@ -18,3 +32,4 @@ class Chat:
     def addfeeds(self, feeds: []):
         for feed in feeds:
             self.addfeed(feed)
+

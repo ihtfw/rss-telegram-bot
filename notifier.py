@@ -11,13 +11,26 @@ class Notifier:
         self.bot = bot
 
     def formatAsHtml(self, text: str):
-        return text.replace('<br />', '\n').replace('<br/>', '\n')
+        return text.replace('<br />', '\n').replace('<br/>', '\n').replace('&nbsp;', ' ').replace('&middot;', '·').replace('&middot;', '·').replace('&amp;', '&').replace('&bull;', '•')
 
     def buildText(self, entry) -> str:
         return '<b>' + entry.title + '</b>\n\n' + self.formatAsHtml(entry.summary)
     
     def send(self, entry):
         self.bot.send_message(chat_id=self.chat.id, text=self.buildText(entry), parse_mode=ParseMode.HTML, disable_web_page_preview=True)   
+
+    def isFiltered(self, feed: Feed, entry) -> bool:
+        for filter in feed.filterBy:
+            title: str = entry.title.lower()
+            summary : str = entry.summary.lower()
+            
+            if title.find(filter.lower()) >= 0:
+                return True
+
+            if summary.find(filter.lower()) >= 0:
+                return True
+        
+        return False
 
     def notify(self) -> bool:
         any: bool = False
@@ -35,9 +48,10 @@ class Notifier:
                 for entry in newsFeed.entries:
                     pTime: time.struct_time = entry.published_parsed
                     if lastUpdateTime == None or pTime > lastUpdateTime:
-                        self.send(entry)                        
-                        feed.lastUpdate = curTime
-                        any = True
+                        if not self.isFiltered(feed, entry):
+                            self.send(entry)                        
+                            feed.lastUpdate = curTime
+                            any = True
 
             except:
                 continue
